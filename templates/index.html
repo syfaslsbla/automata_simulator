@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automata Simulator</title>
+  <link rel="stylesheet" href="/static/css/main.css?v=2">
+  <!-- Cytoscape.js and Dagre layout -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Automata <em>&</em> Regex Simulator</h1>
+      <p>Interactive automata visualizer and converter</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" data-target="tab-dfa">DFA Simulator</button>
+      <button class="tab" data-target="tab-nfa">Regex → NFA</button>
+      <button class="tab" data-target="tab-min">Minimization</button>
+      <button class="tab" data-target="tab-eq">Equivalence</button>
+    </div>
+
+    <!-- ═══ DFA Simulator ═══ -->
+    <div id="tab-dfa" class="tab-panel active">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-label">DFA Definition</div>
+          <div class="form-group">
+            <label>States (comma separated):</label>
+            <input type="text" id="dfa-states" value="q0,q1,q2">
+          </div>
+          <div class="form-group">
+            <label>Alphabet (comma separated):</label>
+            <input type="text" id="dfa-alphabet" value="a,b">
+          </div>
+          <div class="form-group">
+            <label>Start State:</label>
+            <input type="text" id="dfa-start" value="q0">
+          </div>
+          <div class="form-group">
+            <label>Accept States (comma separated):</label>
+            <input type="text" id="dfa-accept" value="q2">
+          </div>
+          <div class="form-group">
+            <label>Transitions (source,symbol,destination per line):</label>
+            <textarea id="dfa-transitions"
+              rows="6">q0,a,q1&#10;q0,b,q0&#10;q1,a,q1&#10;q1,b,q2&#10;q2,a,q2&#10;q2,b,q2</textarea>
+          </div>
+          <button class="btn-primary" id="btn-draw-dfa">Draw Diagram</button>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Simulator</div>
+          <div class="sim-row">
+            <input type="text" id="dfa-input-str" placeholder="Enter string (e.g., aab)">
+            <button class="run" id="btn-sim-dfa">▶ Run</button>
+          </div>
+          <div class="trace" id="dfa-trace"></div>
+          <div id="dfa-result"></div>
+        </div>
+      </div>
+
+      <div class="card mt-1">
+        <div class="card-label">Transition Diagram</div>
+        <div class="cy-container" id="cy-dfa"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Regex -> NFA ═══ -->
+    <div id="tab-nfa" class="tab-panel">
+      <div class="card">
+        <div class="card-label">Regex Input</div>
+        <div class="sim-row">
+          <input type="text" id="regex-input" placeholder="Regular expression, e.g. (a|b)*ab">
+          <button class="run" id="btn-convert-regex">Convert</button>
+        </div>
+      </div>
+
+      <div class="card mt-1">
+        <div class="card-label">NFA Diagram (Thompson Construction)</div>
+        <div class="cy-container" id="cy-nfa"></div>
+      </div>
+
+      <div class="card mt-1">
+        <div class="card-label">Transition Table</div>
+        <div class="table-responsive" id="nfa-table-container"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Minimization ═══ -->
+    <div id="tab-min" class="tab-panel">
+      <div class="card">
+        <div class="card-label">DFA Input</div>
+        <div class="two-col">
+          <div>
+            <div class="form-group">
+              <label>States:</label>
+              <input type="text" id="min-states" value="q0,q1,q2,q3,q4,q5">
+            </div>
+            <div class="form-group">
+              <label>Alphabet:</label>
+              <input type="text" id="min-alphabet" value="0,1">
+            </div>
+            <div class="form-group">
+              <label>Start State:</label>
+              <input type="text" id="min-start" value="q0">
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Accept States:</label>
+              <input type="text" id="min-accept" value="q2,q4">
+            </div>
+            <div class="form-group">
+              <label>Transitions:</label>
+              <textarea id="min-transitions"
+                rows="6">q0,0,q1&#10;q0,1,q2&#10;q1,0,q0&#10;q1,1,q3&#10;q2,0,q4&#10;q2,1,q5&#10;q3,0,q4&#10;q3,1,q5&#10;q4,0,q4&#10;q4,1,q5&#10;q5,0,q5&#10;q5,1,q5</textarea>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary mt-1" id="btn-minimize">Minimize DFA</button>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-label">Original DFA</div>
+          <div class="cy-container" id="cy-min-orig"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Minimized DFA</div>
+          <div class="cy-container" id="cy-min-min"></div>
+        </div>
+      </div>
+
+      <div class="card mt-1" id="min-explanation-card" style="display: none;">
+        <div class="card-label">Console Output / Log Detail</div>
+        <div id="min-explanation-text"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Equivalence ═══ -->
+    <div id="tab-eq" class="tab-panel">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-label">DFA A</div>
+          <div class="form-group"><label>States:</label><input type="text" id="eq-a-states" value="A,B"></div>
+          <div class="form-group"><label>Alphabet:</label><input type="text" id="eq-a-alphabet" value="0,1"></div>
+          <div class="form-group"><label>Start:</label><input type="text" id="eq-a-start" value="A"></div>
+          <div class="form-group"><label>Accept:</label><input type="text" id="eq-a-accept" value="B"></div>
+          <div class="form-group"><label>Transitions:</label><textarea id="eq-a-trans"
+              rows="4">A,0,A&#10;A,1,B&#10;B,0,A&#10;B,1,B</textarea></div>
+        </div>
+        <div class="card">
+          <div class="card-label">DFA B</div>
+          <div class="form-group"><label>States:</label><input type="text" id="eq-b-states" value="X,Y,Z"></div>
+          <div class="form-group"><label>Alphabet:</label><input type="text" id="eq-b-alphabet" value="0,1"></div>
+          <div class="form-group"><label>Start:</label><input type="text" id="eq-b-start" value="X"></div>
+          <div class="form-group"><label>Accept:</label><input type="text" id="eq-b-accept" value="Z"></div>
+          <div class="form-group"><label>Transitions:</label><textarea id="eq-b-trans"
+              rows="6">X,0,Y&#10;X,1,Z&#10;Y,0,X&#10;Y,1,Z&#10;Z,0,Y&#10;Z,1,Z</textarea></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <button class="btn-primary" id="btn-check-eq">Check Equivalence</button>
+        <div id="eq-result" class="mt-1"></div>
+      </div>
+
+      <div class="two-col mt-1">
+        <div class="card">
+          <div class="card-label">DFA A Graph</div>
+          <div class="cy-container" id="cy-eq-a"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">DFA B Graph</div>
+          <div class="cy-container" id="cy-eq-b"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="/static/js/app.js?v=2"></script>
+  <script type="module" src="/static/js/diagram.js?v=2"></script>
+  <script type="module" src="/static/js/dfa_panel.js?v=2"></script>
+  <script type="module" src="/static/js/nfa_panel.js?v=2"></script>
+  <script type="module" src="/static/js/minimize_panel.js?v=2"></script>
+  <script type="module" src="/static/js/equiv_panel.js?v=2"></script>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+</body>
+
+</html>
