@@ -1,5 +1,5 @@
 import { apiPost } from './app.js?v=2';
-import { initDiagram } from './diagram.js?v=2';
+import { initDiagram, highlightParallelPath } from './diagram.js?v=2';
 
 let cyEqA = null;
 let cyEqB = null;
@@ -31,6 +31,57 @@ document.getElementById('btn-check-eq').addEventListener('click', async () => {
         const ce = res.counterexample === "" ? "ε (string kosong)" : res.counterexample;
         resDiv.innerHTML = `<span class="result r-rej">✗ NOT EQUIVALENT — Counterexample: "${ce}" (Diterima oleh satu DFA tapi ditolak oleh yang lain).</span>`;
     }
+
+    const tableCard = document.getElementById('eq-table-card');
+    const tableContainer = document.getElementById('eq-table-container');
+
+    if (res.proof_table && res.proof_table.length > 0) {
+        tableCard.style.display = 'block';
+        
+        const alphabetSymbols = Object.keys(res.proof_table[0].transitions);
+        
+        let html = `<table class="nfa-table">
+                      <thead>
+                        <tr>
+                          <th>(s, s')</th>`;
+                          
+        alphabetSymbols.forEach(sym => {
+            html += `<th>alfabet '${sym}'</th>`;
+        });
+        
+        html += `         <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>`;
+                      
+        res.proof_table.forEach(row => {
+            html += `<tr>
+                       <td>
+                       (${row.pair[0]}, ${row.pair[1]})<br>
+                       <small style="color: yellow; font-weight: normal;">${row.keterangan}</small>
+                       </td>`;
+                       
+            alphabetSymbols.forEach(sym => {
+                const dest = row.transitions[sym];
+                html += `<td style="text-align: center;">
+                           (${dest.pair[0]}, ${dest.pair[1]})<br>
+                           <small style="color: #b0bec5; font-weight: normal;">${dest.keterangan}</small>
+                         </td>`;
+            });
+            
+            let statusColor = "#EF4444";
+            if (row.status === "PENDING") statusColor = "yellow";
+            if (row.status === "EKUIVALEN") statusColor = "lime";
+            
+            html += `<td style="color: ${statusColor}; font-weight: bold;">${row.status}</td>
+                     </tr>`;
+        });
+        
+        html += `</tbody></table>`;
+        tableContainer.innerHTML = html;
+    } else {
+        if (tableCard) tableCard.style.display = 'none';
+    }
     
     if (cyEqA) cyEqA.destroy();
     if (cyEqB) cyEqB.destroy();
@@ -38,4 +89,7 @@ document.getElementById('btn-check-eq').addEventListener('click', async () => {
     cyEqA = initDiagram('cy-eq-a', res.dfa_a_graph.graph_elements, false);
     cyEqB = initDiagram('cy-eq-b', res.dfa_b_graph.graph_elements, false);
 
+    if (res.proof_table && res.proof_table.length > 0) {
+        highlightParallelPath(cyEqA, cyEqB, res.proof_table, 1500);
+    }
 });

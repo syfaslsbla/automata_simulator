@@ -25,11 +25,12 @@ async def check_equivalence(req: EquivalenceRequest):
     if error_b:
         raise HTTPException(status_code=400, detail=f"DFA B: {error_b}")
         
-    equivalent, counterexample = dfa_a.is_equivalent_to(dfa_b)
+    equivalent, counterexample, proof_table = dfa_a.is_equivalent_to(dfa_b)
     
     return {
         "equivalent": equivalent,
         "counterexample": counterexample,
+        "proof_table": proof_table,
         "dfa_a_graph": {"graph_elements": dfa_to_cytoscape(dfa_a)},
         "dfa_b_graph": {"graph_elements": dfa_to_cytoscape(dfa_b)}
     }

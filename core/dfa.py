@@ -281,54 +281,113 @@ class DFA:
     #  FITUR 4 – CEK EKUIVALENSI DUA DFA                                  #
     # ------------------------------------------------------------------ #
 
-    def is_equivalent_to(self, other: 'DFA') -> Tuple[bool, Optional[str]]:
+    def is_equivalent_to(self, other: 'DFA') -> Tuple[bool, Optional[str], List[dict]]:
         """
-        Cek apakah dua DFA menerima bahasa yang sama.
+        Cek apakah dua DFA menerima bahasa yang sama menggunakan metode 
+        Tabel Pelacakan Paralel (Parallel State Tracking).
 
-        Algoritma (Product Construction + BFS):
-        Buat automaton produk dari kedua DFA. State produk adalah pasangan
-        (s1, s2) di mana s1 ∈ DFA1 dan s2 ∈ DFA2.
-        Dua DFA ekuivalen ↔ tidak ada state produk (s1, s2) yang reachable
-        di mana tepat satu dari s1 atau s2 adalah accepting state.
-
-        Jika tidak ekuivalen, kembalikan counterexample (string yang
-        diterima oleh salah satu DFA tapi tidak oleh yang lain).
+        Algoritma:
+        1. Mulai dengan pasangan state awal (start1, start2).
+        2. Untuk setiap pasangan, cek transisi untuk setiap simbol di alphabet.
+        3. Jika menemukan pasangan di mana satu state adalah Final State 
+           dan yang lainnya Non-Final, maka TIDAK EKUIVALEN.
+        4. Jika tidak ada lagi pasangan baru yang bisa ditelusuri dan 
+           tidak ada mismatch, maka EKUIVALEN.
 
         Returns:
-            (is_equivalent: bool, counterexample: str | None)
+            (is_equivalent: bool, counterexample: str | None, proof_table: list[dict])
         """
-        # BFS pada automaton produk
-        start = (self.start_state, other.start_state)
-        visited = {}
-        queue = [(start, "")]  # (state_pair, string_so_far)
+        # jika alfabet berbeda, langsung tidak ekuivalen
+        if self.alphabet != other.alphabet:
+            return False, "Alphabet kedua DFA berbeda", []
 
+        alphabet_sorted = sorted(list(self.alphabet))
+        
+        start_pair = (self.start_state, other.start_state)
+        queue = [(start_pair, "")]
+        visited_pairs = []
+        proof_table = [] # untuk menyimpan log setiap langkah pemeriksaan pasangan state
+        
         while queue:
-            (s1, s2), path = queue.pop(0)
-            if (s1, s2) in visited:
+            current_pair, path = queue.pop(0)
+            if current_pair in visited_pairs:
                 continue
-            visited[(s1, s2)] = path
+                
+            visited_pairs.append(current_pair)
+            s1, s2 = current_pair
+            
+            # Cek apakah tiap states adalah final atau non-final
+            a1 = s1 in self.accept_states
+            a2 = s2 in other.accept_states
 
-            a1 = (s1 in self.accept_states)
-            a2 = (s2 in other.accept_states)
+            l1 = "F" if a1 else "non"
+            l2 = "F" if a2 else "non"
 
-            if a1 != a2:
-                # Ditemukan state yang membedakan – tidak ekuivalen
-                return False, path
+            row_log = {
+                "pair": current_pair,
+                "transitions": {},
+                "keterangan": f"({l1}, {l2})",
+                "status": "PENDING"
+            }
 
-            # Ekspansi ke state berikutnya
-            combined_alphabet = self.alphabet | other.alphabet
-            for sym in sorted(combined_alphabet):
-                ns1 = self.transitions.get((s1, sym)) if sym in self.alphabet else None
-                ns2 = other.transitions.get((s2, sym)) if sym in other.alphabet else None
+            mismatch_sym = None
 
-                # Jika salah satu tidak punya transisi, anggap dead state
-                ns1 = ns1 if ns1 else f"_dead_{self.start_state}"
-                ns2 = ns2 if ns2 else f"_dead_{other.start_state}"
+            for sym in alphabet_sorted:
+                ns1 = self.transitions.get((s1, sym), "DEAD")
+                ns2 = other.transitions.get((s2, sym), "DEAD")
+                
+                next_pair = (ns1, ns2)
+                
+                # Tentukan jenis state berikutnya (final/non-final)
+                nl1 = "F" if ns1 in self.accept_states else "non"
+                nl2 = "F" if ns2 in other.accept_states else "non"
+                
+                # Simpan informasi transisi untuk tabel 
+                row_log["transitions"][sym] = {
+                    "pair": next_pair,
+                    "keterangan": f"({nl1}, {nl2})"
+                }
 
-                if (ns1, ns2) not in visited:
-                    queue.append(((ns1, ns2), path + sym))
+                if nl1 != nl2 and mismatch_sym is None:
+                    mismatch_sym = sym
+            
+            # JIka jenis state berbeda, maka tidak ekuivalen
+            if a1 != a2:    
+                row_log["status"] = "NON EKUIVALEN"
+                proof_table.append(row_log)
+                return False, path, proof_table
+            
+            # Jika jenis next state berbeda, maka tidak ekuivalen
+            if mismatch_sym:
+                row_log["status"] = "NON EKUIVALEN"
+                proof_table.append(row_log)
+                return False, path + mismatch_sym, proof_table
 
-        return True, None
+            # Jika jenis state sama, lanjutkan cek transisi
+            row_log["status"] = "PENDING"
+            for sym in alphabet_sorted:
+                ns1 = self.transitions.get((s1, sym))
+                ns2 = other.transitions.get((s2, sym))
+                
+                # Jika tidak ada transisi, anggap sebagai DEAD state
+                ns1 = ns1 if ns1 else "DEAD"
+                ns2 = ns2 if ns2 else "DEAD"
+                
+                next_pair = row_log["transitions"][sym]["pair"]
+                
+                in_queue = any(q[0] == next_pair for q in queue)
+                
+                # Jika pasangan berikutnya belum pernah diperiksa, tambahkan ke queue
+                if next_pair not in visited_pairs and not in_queue:
+                    queue.append((next_pair, path + sym))            
+
+            proof_table.append(row_log)
+            
+        # Jika semua pasangan sudah diperiksa dan tidak ditemukan mismatch, maka ekuivalen
+        if proof_table:
+            proof_table[-1]["status"] = "EKUIVALEN"
+            
+        return True, None, proof_table
 
     def to_dict(self) -> dict:
         """Serialisasi DFA ke dictionary (untuk keperluan GUI)."""
