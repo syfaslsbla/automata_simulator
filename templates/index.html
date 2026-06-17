@@ -27,53 +27,57 @@
       <button class="tab" data-target="tab-eq">Equivalence</button>
     </div>
 
-    <!-- ═══ DFA Simulator ═══ -->
+    <!-- DFA Simulator -->
     <div id="tab-dfa" class="tab-panel active">
       <div class="two-col">
-        <div class="card">
-          <div class="card-label">DFA Definition</div>
-          <div class="form-group">
-            <label>States (comma separated):</label>
-            <input type="text" id="dfa-states" value="q0,q1,q2">
+
+        <div>
+          <div class="card">
+            <div class="card-label">DFA Definition</div>
+            <div class="form-group">
+              <label>States (comma separated):</label>
+              <input type="text" id="dfa-states" value="q0,q1,q2">
+            </div>
+            <div class="form-group">
+              <label>Alphabet (comma separated):</label>
+              <input type="text" id="dfa-alphabet" value="a,b">
+            </div>
+            <div class="form-group">
+              <label>Start State:</label>
+              <input type="text" id="dfa-start" value="q0">
+            </div>
+            <div class="form-group">
+              <label>Accept States (comma separated):</label>
+              <input type="text" id="dfa-accept" value="q2">
+            </div>
+            <div class="form-group">
+              <label>Transition Table δ(q, a):</label>
+              <div id="dfa-trans-table-container">
+                <p class="trans-hint">Isi States dan Alphabet terlebih dahulu.</p>
+              </div>
+            </div>
+            <button class="btn-primary" id="btn-draw-dfa">Draw Diagram</button>
           </div>
-          <div class="form-group">
-            <label>Alphabet (comma separated):</label>
-            <input type="text" id="dfa-alphabet" value="a,b">
-          </div>
-          <div class="form-group">
-            <label>Start State:</label>
-            <input type="text" id="dfa-start" value="q0">
-          </div>
-          <div class="form-group">
-            <label>Accept States (comma separated):</label>
-            <input type="text" id="dfa-accept" value="q2">
-          </div>
-          <div class="form-group">
-            <label>Transitions (source,symbol,destination per line):</label>
-            <textarea id="dfa-transitions"
-              rows="6">q0,a,q1&#10;q0,b,q0&#10;q1,a,q1&#10;q1,b,q2&#10;q2,a,q2&#10;q2,b,q2</textarea>
-          </div>
-          <button class="btn-primary" id="btn-draw-dfa">Draw Diagram</button>
         </div>
 
-        <div class="card">
-          <div class="card-label">Simulator</div>
-          <div class="sim-row">
-            <input type="text" id="dfa-input-str" placeholder="Enter string (e.g., aab)">
-            <button class="run" id="btn-sim-dfa">▶ Run</button>
-          </div>
-          <div class="trace" id="dfa-trace"></div>
-          <div id="dfa-result"></div>
+        <div class="card card-fill">
+            <div class="card-label">Transition Diagram</div>
+            <div class="cy-container" id="cy-dfa"></div>
         </div>
       </div>
 
       <div class="card mt-1">
-        <div class="card-label">Transition Diagram</div>
-        <div class="cy-container" id="cy-dfa"></div>
+            <div class="card-label">Simulator</div>
+            <div class="sim-row">
+              <input type="text" id="dfa-input-str" placeholder="Enter string (e.g., aab)">
+              <button class="run" id="btn-sim-dfa">▶ Run</button>
+            </div>
+            <div class="trace" id="dfa-trace"></div>
+            <div id="dfa-result"></div>
       </div>
     </div>
 
-    <!-- ═══ Regex -> NFA ═══ -->
+    <!-- Regex ke NFA -->
     <div id="tab-nfa" class="tab-panel">
       <div class="card">
         <div class="card-label">Regex Input</div>
@@ -94,7 +98,7 @@
       </div>
     </div>
 
-    <!-- ═══ Minimization ═══ -->
+    <!-- DFA Minimization -->
     <div id="tab-min" class="tab-panel">
       <div class="card">
         <div class="card-label">DFA Input</div>
@@ -119,9 +123,10 @@
               <input type="text" id="min-accept" value="q2,q4">
             </div>
             <div class="form-group">
-              <label>Transitions:</label>
-              <textarea id="min-transitions"
-                rows="6">q0,0,q1&#10;q0,1,q2&#10;q1,0,q0&#10;q1,1,q3&#10;q2,0,q4&#10;q2,1,q5&#10;q3,0,q4&#10;q3,1,q5&#10;q4,0,q4&#10;q4,1,q5&#10;q5,0,q5&#10;q5,1,q5</textarea>
+              <label>Transition Table δ(q, a):</label>
+              <div id="min-trans-table-container">
+                <p class="trans-hint">Isi States dan Alphabet terlebih dahulu.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -145,7 +150,7 @@
       </div>
     </div>
 
-    <!-- ═══ Equivalence ═══ -->
+    <!-- DFA Equivalence -->
     <div id="tab-eq" class="tab-panel">
       <div class="two-col">
         <div class="card">
@@ -196,7 +201,6 @@
   <script type="module" src="/static/js/minimize_panel.js?v=2"></script>
   <script type="module" src="/static/js/equiv_panel.js?v=2"></script>
 
-  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
 </body>
