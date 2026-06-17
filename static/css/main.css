@@ -137,6 +137,11 @@ header p {
   background: var(--border);
 }
 
+.card-fill {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Forms */
 .form-group {
   margin-bottom: 0.8rem;
@@ -314,7 +319,6 @@ th {
   text-align: center;
   letter-spacing: 0.08em;
   font-size: 0.72rem;
-  text-transform: uppercase;
 }
 
 th:first-child {
@@ -345,6 +349,12 @@ tr:hover td {
   position: relative;
 }
 
+.card-fill .cy-container {
+  flex: 1;
+  min-height: 350px;
+  height: auto;
+}
+
 /* Toast */
 .toast {
   position: fixed;
@@ -371,10 +381,129 @@ tr:hover td {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  align-items: stretch;
 }
 
 @media(max-width:768px) {
   .two-col {
     grid-template-columns: 1fr;
   }
+}
+
+.trans-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+  padding: 0.4rem 0;
+}
+
+.trans-table-wrap {
+  overflow-x: auto;
+  margin-top: 0.2rem;
+}
+
+.trans-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.trans-table thead th {
+  color: var(--accent);
+  font-weight: 600;
+  padding: 0.45rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  background: #111;
+}
+
+.trans-table thead th:first-child {
+  text-align: left;
+  min-width: 70px;
+}
+
+.trans-table tbody td {
+  padding: 0;
+  border-bottom: 1px solid rgba(42, 42, 42, 0.6);
+  border-right: 1px solid rgba(42, 42, 42, 0.4);
+  text-align: center;
+}
+
+.trans-table tbody td:last-child {
+  border-right: none;
+}
+
+.trans-table tbody tr:hover td {
+  background: rgba(240, 192, 64, 0.04);
+}
+
+.trans-table .state-cell {
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent);
+  background: #111;
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  font-size: 0.82rem;
+  min-width: 70px;
+}
+
+.trans-table .trans-input {
+  width: 100%;
+  min-width: 60px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.trans-table .trans-input:focus {
+  background: rgba(240, 192, 64, 0.08);
+  color: var(--accent);
+}
+
+.trans-table .trans-input::placeholder {
+  color: #3a3a3a;
+}
+
+/* Operator Help */
+.operator-help {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.operator-help h3 {
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.operator-help ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.operator-help li {
+  color: var(--text);
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.operator-help .symbol {
+  color: var(--accent);
+  font-weight: 700;
+  display: inline-block;
+  width: 24px;
 }
