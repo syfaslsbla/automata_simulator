@@ -474,3 +474,36 @@ tr:hover td {
 .trans-table .trans-input::placeholder {
   color: #3a3a3a;
 }
+
+/* Operator Help */
+.operator-help {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.operator-help h3 {
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.operator-help ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.operator-help li {
+  color: var(--text);
+  font-size: 0.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.operator-help .symbol {
+  color: var(--accent);
+  font-weight: 700;
+  display: inline-block;
+  width: 24px;
+}
