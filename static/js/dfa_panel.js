@@ -121,19 +121,22 @@ document.getElementById('btn-sim-dfa').addEventListener('click', async () => {
     resDiv.innerHTML   = '';
 
     let html = '';
-    for (let i = 0; i < res.steps.length; i++) {
+    for (let i = 1; i < res.steps.length; i++) {
         const step = res.steps[i];
+        const acceptList = getDfaInput().accept_states.split(',').map(s => s.trim());
+        const isAcc = acceptList.includes(step.current_state);
+
+        html += `<span class="t-state ${isAcc ? 'acc' : ''}" id="trace-step-${i}">${step.current_state}</span>`;
+        
+        if (i < res.steps.length - 1 && step.symbol) {
+            html += ` <span class="t-sym">─${step.symbol}→</span> `;
+        }
+
         if (i === res.steps.length - 1) {
             if (res.accepted) {
-                resDiv.innerHTML = `<span class="result r-acc">✓ ACCEPT — ${step.description}</span>`;
+                resDiv.innerHTML = `<span class="result r-acc">✓ ACCEPT — State akhir '${step.current_state}' adalah accepting state → DITERIMA</span>`;
             } else {
-                resDiv.innerHTML = `<span class="result r-rej">✗ REJECT — ${step.description}</span>`;
-            }
-        } else {
-            const isAcc = getDfaInput().accept_states.split(',').map(s => s.trim()).includes(step.current_state);
-            html += `<span class="t-state ${isAcc ? 'acc' : ''}" id="trace-step-${i}">${step.current_state}</span>`;
-            if (step.symbol) {
-                html += ` <span class="t-sym">─${step.symbol}→</span> `;
+                resDiv.innerHTML = `<span class="result r-rej">✗ REJECT — State akhir '${step.current_state}' bukan accepting state → DITOLAK</span>`;
             }
         }
     }
