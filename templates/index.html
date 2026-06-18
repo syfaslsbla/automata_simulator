@@ -110,6 +110,18 @@
         <div class="card-label">Transition Table</div>
         <div class="table-responsive" id="nfa-table-container"></div>
       </div>
+
+      <div class="card mt-1">
+        <div class="card-label">NFA Simulator</div>
+
+        <div class="sim-row">
+            <input type="text" id="nfa-input-str" placeholder="Enter string (e.g., aab)">
+            <button class="run" id="btn-sim-nfa">▶ Run</button>
+        </div>
+
+        <div class="trace" id="nfa-trace"></div>
+        <div id="nfa-result"></div>
+      </div>
     </div>
 
     <!-- DFA Minimization -->
