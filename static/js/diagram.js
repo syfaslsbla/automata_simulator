@@ -148,6 +148,15 @@ export function highlightPath(cy, steps, speed = 800) {
         if (step.symbol && step.next_state && step.next_state !== 'DEAD') {
             // Find edge between current and next
             cy.edges().filter(e => e.source().id() === step.current_state && e.target().id() === step.next_state).addClass('active');
+        }else if (step.symbol && step.next_states && step.next_states) {
+            step.current_states.forEach(current => {
+                step.next_states.forEach(next => {
+
+                    cy.edges().filter(e => e.source().id() === current && e.target().id() === next &&
+                        String(e.data('label')).split(',').map(s => s.trim()).includes(step.symbol)
+                    ).addClass('active');
+                    });
+            });
         }
         
         i++;
