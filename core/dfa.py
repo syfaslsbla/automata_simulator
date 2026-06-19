@@ -9,7 +9,7 @@ Algoritma yang digunakan:
   dan mengecek apakah state akhir termasuk accepting states.
 - Minimasi DFA: Algoritma Table-Filling (Myhill-Nerode) menggunakan
   pendekatan partisi untuk mengelompokkan state yang ekuivalen.
-- Cek Ekuivalensi: Menggunakan product construction atau BFS/DFS
+- Cek Ekuivalensi: Menggunakan Simultaneous State Traversal berbasis BFS
   pada perbedaan simetris dua DFA.
 """
 

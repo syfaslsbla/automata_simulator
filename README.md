@@ -8,7 +8,7 @@ Program simulasi automata berbasis Web (FastAPI + HTML/CSS/JS) yang mengimplemen
 | 1 | Simulasi DFA | Deterministik step-by-step |
 | 2 | Regex -> NFA | Thompson Construction |
 | 3 | Minimasi DFA | Table-Filling (Myhill-Nerode) |
-| 4 | Ekuivalensi DFA | Product Construction + BFS |
+| 4 | Ekuivalensi DFA | Simultaneous State Traversal via BFS |
 
 ---
 
