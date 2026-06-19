@@ -28,8 +28,12 @@ document.getElementById('btn-check-eq').addEventListener('click', async () => {
     if (res.equivalent) {
         resDiv.innerHTML = `<span class="result r-acc">✓ EQUIVALENT — Kedua DFA menerima bahasa yang persis sama.</span>`;
     } else {
-        const ce = res.counterexample === "" ? "ε (string kosong)" : res.counterexample;
-        resDiv.innerHTML = `<span class="result r-rej">✗ NOT EQUIVALENT — Counterexample: "${ce}" (Diterima oleh satu DFA tapi ditolak oleh yang lain).</span>`;
+        if (!res.proof_table || res.proof_table.length === 0) {
+            resDiv.innerHTML = `<span class="result r-rej">✗ NOT EQUIVALENT — ${res.counterexample}</span>`;
+        } else {
+            const ce = res.counterexample === "" ? "ε (string kosong)" : res.counterexample;
+            resDiv.innerHTML = `<span class="result r-rej">✗ NOT EQUIVALENT — Counterexample: "${ce}" (Diterima oleh satu DFA tapi ditolak oleh yang lain).</span>`;
+        }
     }
 
     const tableCard = document.getElementById('eq-table-card');
